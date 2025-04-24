@@ -1,11 +1,11 @@
 import * as path from "node:path";
 import BracketsFormatters from "@/db/formatters/Brackets.formatters";
-import transfersQuery from "@/db/query/transfersQuery";
-import Database from "better-sqlite3";
 import earliestTransferQuery from "@/db/query/earliestTransfer.query";
 import latestTransferQuery from "@/db/query/latestTransfer.query";
+import transfersQuery from "@/db/query/transfersQuery";
+import Database from "better-sqlite3";
 
-const dbPath = path.resolve(process.cwd(), "src/db/transfers.db");
+const dbPath = path.resolve(process.cwd(), "src/db/new_transfers.db");
 const db = new Database(dbPath, {readonly: true});
 
 export default class DB {
@@ -29,10 +29,7 @@ export default class DB {
 	getTransfers(filters: IFilters): DB {
 		console.time("getTransfers");
 		// Convert milliseconds (fromMs, toMs) to YYYY-MM-DD HH:MM:SS format
-		const fromDateTime = new Date(+filters.transfersCurrentFromMs!)
-			.toISOString()
-			.slice(0, 19)
-			.replace("T", " ");
+		const fromDateTime = new Date(+filters.transfersCurrentFromMs!).toISOString().slice(0, 19).replace("T", " ");
 		const toDateTime = new Date(+filters.transfersCurrentToMs!).toISOString().slice(0, 19).replace("T", " ");
 		const selectedAges = (filters.selectedAges! as unknown as string).split(",");
 

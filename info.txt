@@ -1,0 +1,55 @@
+# 1. Create a temporary dump with only the data you want to keep
+sqlite3 transfers.db <<EOF
+.mode insert transfers
+.once transfers_dump.sql
+SELECT
+  id, pid, name, country, age, height, weight, season, week,
+  price, form, stamina, pace, technique, passing, keeper,
+  defender, playmaker, striker, value, wage, transfer_date, transfer_time
+FROM transfers
+WHERE is_finished = 1;
+EOF
+
+# 2. Create a new database with just what you need
+sqlite3 new_transfers.db <<EOF
+CREATE TABLE transfers (
+  id INTEGER,
+  pid INTEGER,
+  name TEXT,
+  country TEXT,
+  age INTEGER,
+  height INTEGER,
+  weight INTEGER,
+  season INTEGER,
+  week INTEGER,
+  price INTEGER,
+  form INTEGER,
+  stamina INTEGER,
+  pace INTEGER,
+  technique INTEGER,
+  passing INTEGER,
+  keeper INTEGER,
+  defender INTEGER,
+  playmaker INTEGER,
+  striker INTEGER,
+  value INTEGER,
+  wage INTEGER,
+  transfer_date TEXT,
+  transfer_time TEXT
+);
+
+.read transfers_dump.sql
+
+-- Optional: Add indexes if needed for performance
+CREATE INDEX idx_transfers_pid ON transfers(pid);
+CREATE INDEX idx_transfers_name ON transfers(name);
+EOF
+
+# 3. Optimize the database size
+sqlite3 new_transfers.db "VACUUM;"
+
+# 4. Replace the original database with the new one
+mv new_transfers.db transfers.db
+
+# 5. Clean up temporary file
+rm transfers_dump.sql
