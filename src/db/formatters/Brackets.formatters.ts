@@ -74,13 +74,11 @@ export default class BracketsFormatters {
 	}
 
 	byWeekday(): DB {
-		let brackets: {
-			[key: keyof TWeekday]: number;
-		} = {Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0};
+		let brackets: Record<TWeekday, number> = {Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0};
 
 		this.db.data.forEach((transfer: ITransfer) => {
 			const date = new Date(transfer.transfer_date);
-			const weekday: TWeekday = date.toLocaleDateString("en-US", {weekday: "short"}); // Get weekday name (e.g. "Tuesday")
+			const weekday = date.toLocaleDateString("en-US", {weekday: "short"}) as TWeekday; // Get weekday name (e.g. "Tuesday")
 			brackets[weekday] += 1;
 		});
 		this.db.data = brackets;
@@ -96,6 +94,7 @@ export default class BracketsFormatters {
 	toLine({seriesName, minY}: { seriesName?: string[]; minY?: number }): DB {
 		// TODO: Object.values(this.db.data) can be nested array for multiple lines
 		let values: (number | number[])[] = Object.values(this.db.data);
+		// @ts-ignore
 		const maxY = Math.max.apply(null, values);
 		// const isNestedArray = values.some(value => Array.isArray(value));
 		this.db.data = {
@@ -109,6 +108,7 @@ export default class BracketsFormatters {
 				},
 			],
 			xAxisData: Object.keys(this.db.data),
+			// @ts-ignore
 			minY: minY !== undefined ? minY : Math.min.apply(null, values),
 			maxY: Math.round(maxY + maxY * 0.1), // +10%
 		};
