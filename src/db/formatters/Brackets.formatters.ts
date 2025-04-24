@@ -1,5 +1,4 @@
 import DB from "@/db/DB";
-import {TWeekday} from "@/types/global";
 
 export default class BracketsFormatters {
 	db!: DB;
